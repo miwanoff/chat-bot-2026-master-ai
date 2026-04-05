@@ -1,66 +1,132 @@
-const phrases = [
-  "Наш менеджер передзвонить Вам найближчим часом!",
-  "Уточнити деталі можна за телефоном 123456789",
-  "Залишайтеся на зв'язку!",
-  "Сьогодні чудова погода!",
-  "З Вами дуже приємно спілкуватися!",
-];
+import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-const hello = "Привіт!";
-const goodbye = "До побачення!";
+// --- КОНФІГУРАЦІЯ ---
+const API_KEY = ""; // Вставте свій API-ключ тут пізніше
 
-$("h1").css("color", "blue");
+const businessInfo = `
+    Ти – дружній та експертний чат-бот-помічник для стартапу "AI Лаб". Твоя мета – відповідати на запитання користувачів, використовуючи інформацію про компанію та дотримуючись її тону голосу.
 
+    **Основна інформація про "AI Лаб":**
+    - **Назва:** AI Лаб (AI Lab)
+    - **Що це:** Освітня онлайн-платформа з програмування та штучного інтелекту (AI) для підлітків середнього та старшого шкільного віку (13-17 років).
+    - **Місія:** Зробити світ програмування та AI захопливим і зрозумілим для кожного підлітка, надаючи їм інструменти та знання для створення свого цифрового майбутнього.
+    - **Унікальна пропозиція:** Ми перетворюємо складне навчання на захопливі "мікро-уроки", адаптовані для підлітків та інтегровані в їхні улюблені соцмережі (YouTube, TikTok). Ми фокусуємося не просто на кодуванні, а на творчості та створенні реальних проєктів.
+    - **Курси:** Пропонуємо курси за напрямками: основи Python, штучний інтелект для початківців, веб-розробка. Наприклад, на курсі з Python учні створюють власні ігри та чат-ботів.
+    - **Цінності:** Креативність, Доступність, Інноваційність, Розвиток, Спільнота.
+    - **Цільова аудиторія:** Підлітки 13-17 років та їхні батьки.
+    
+    **Правила твого спілкування (Tone of Voice):**
+    - **Архетипи:** Твій стиль поєднує "Творця" (надихаєш на інновації, заохочуєш експерименти) та "Мудреця" (надаєш знання простою мовою, є джерелом експертизи).
+    - **Стиль:** Надихаючий, заохочуючий, експертний, але доступний. Говори сучасною, простою мовою.
+    - **Приклади фраз:** "Створюй!", "Це простіше, ніж здається!", "Код – це твоя нова суперсила!".
+    - **Чого уникати:** Надмірної формальності, менторського тону, складного жаргону без пояснень. Будь дружнім наставником, а не екзаменатором.
+    - **Звертання:** Звертайся до користувача на "ти", якщо це підліток, і на "ви", якщо зрозуміло, що це доросла людина (наприклад, батько/мати). Якщо не впевнений, використовуй універсальні форми.
+`;
+
+// --- Ініціалізація моделі ---
+const genAI = new GoogleGenerativeAI(API_KEY);
+const model = genAI.getGenerativeModel({ 
+    model: "gemini-1.5-flash",
+});
+
+let chat;
+
+// --- UI Logic ---
 $("#chatbot").click(function () {
-  $(this).toggleClass("show");
+    $(this).toggleClass("show");
 });
 
-$("#answers").append(`<div class="bot_answ">${hello}</div>`);
-
-// stopPropagation()
-$("#answers").click(function () {
-  return false;
+// stopPropagation() equivalent for the message and input area to prevent toggle on interaction
+$("#answers, #question, #ok").click(function (e) {
+    e.stopPropagation();
 });
 
-$("#question").click(function () {
-  return false;
-});
-
-$("#ok").click(function () {
-  let q = $("#question").val().trim();
-  // console.log(q);
-  $("#question").val("");
-  if (q !== "") {
-    $("#answers").append(`<div class="human_answ">${q}</div>`);
-
-    setTimeout(function () {
-      if (
-        q.toLowerCase().includes("bye") ||
-        q.toLowerCase().includes("побачення") ||
-        q.toLowerCase().includes("пока") ||
-        q.toLowerCase().includes("попа")
-      ) {
-        $("#answers").append(`<div class="bot_answ">${goodbye}</div>`);
-      } else {
-        $("#answers").append(`<div class="bot_answ">${phrases[0]}</div>`);
-      }
-      const chatBot = document.getElementById("chatbot");
-      $("#chatbot").animate(
-        {
-          scrollTop: chatBot.scrollHeight - chatBot.clientHeight,
-        },
-        100,
-      );
-    }, 1000);
-  }
-  return false;
-});
-
-function enterKey(event) {
-  if (event.keyCode == 13) {
-    $("#ok").click();
-    return false;
-  }
+// Додавання повідомлення в чат
+function displayMessage(role, text) {
+    const className = role === 'user' ? 'human_answ' : 'bot_answ';
+    $("#answers").append(`<div class="${className}">${text}</div>`);
+    scrollToBottom();
 }
 
-$("#question").keypress("keyup", enterKey);
+function showLoading() {
+    $("#answers").append(`<div class="bot_answ loading-indicator" id="loading">AI Лаб думає...</div>`);
+    scrollToBottom();
+}
+
+function hideLoading() {
+    $("#loading").remove();
+}
+
+function scrollToBottom() {
+    const chatBot = document.getElementById("chatbot");
+    $("#chatbot").animate(
+        {
+            scrollTop: chatBot.scrollHeight - chatBot.clientHeight,
+        },
+        100
+    );
+}
+
+// Ініціалізація чату
+async function initializeChat() {
+    chat = model.startChat({
+        history: [
+            {
+                role: "user",
+                parts: [{ text: `Запам'ятай інструкцію: ${businessInfo}\n\nТепер ти готовий відповідати на запитання.` }],
+            },
+            {
+                role: "model",
+                parts: [{ text: "Добре, я готовий. Я – дружній та експертний чат-бот-помічник для стартапу \"AI Лаб\"." }],
+            }
+        ],
+        generationConfig: {
+            maxOutputTokens: 1000,
+        },
+    });
+    
+    displayMessage('model', "Привіт! Я помічник AI Лаб. Чим можу допомогти? Запитай мене про наші курси, місію або як почати вчитися кодувати!");
+}
+
+// Обробка відправки
+async function handleSend() {
+    const q = $("#question").val().trim();
+    if (q === "") return;
+
+    $("#question").val("");
+    displayMessage('user', q);
+
+    if (!API_KEY) {
+        displayMessage('model', 'Помилка: API-ключ не вказано. Будь ласка, додайте свій ключ у змінну API_KEY у коді.');
+        return;
+    }
+
+    showLoading();
+
+    try {
+        const result = await chat.sendMessage(q);
+        const response = result.response;
+        const text = response.text();
+
+        hideLoading();
+        displayMessage('model', text);
+    } catch (error) {
+        console.error("Помилка при запиті до Gemini API:", error);
+        hideLoading();
+        displayMessage('model', 'Ой, сталася помилка. Спробуйте, будь ласка, ще раз.');
+    }
+}
+
+$("#ok").click(handleSend);
+
+$("#question").on("keypress", function (event) {
+    if (event.which === 13) {
+        handleSend();
+        return false;
+    }
+});
+
+// Запуск при завантаженні
+$(document).ready(function() {
+    initializeChat();
+});
