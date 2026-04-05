@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Bot</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* Custom Styles */
+        :root {
+            --dark-blue: #1a2035;
+            --primary-blue: #00BFFF;
+            --accent-lime: #A7FF00;
+            --light-bg: #F5F5F5;
+            --white: #FFFFFF;
+            --dark-text: #1A1A1A;
+            --light-text: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .navbar-brand,
+        .btn {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
+
+        .bg-dark-blue {
+            background-color: var(--dark-blue);
+        }
+
+        .text-lime {
+            color: var(--accent-lime);
+        }
+
+        .text-primary-blue {
+            color: var(--primary-blue);
+        }
+
+        .btn-lime {
+            background-color: var(--accent-lime);
+            color: var(--dark-text);
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .btn-lime:hover {
+            background-color: #c4ff4d;
+            color: var(--dark-text);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(167, 255, 0, 0.2);
+        }
+
+        .btn-outline-light {
+            border-radius: 50px;
+            padding: 10px 28px;
+        }
+
+        .navbar {
+            background-color: var(--dark-blue);
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+        }
+
+        .hero-section {
+            padding: 120px 0;
+            color: var(--light-text);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero-section h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+        }
+
+        .section-padding {
+            padding: 80px 0;
+        }
+
+        .card {
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .course-card {
+            background-color: #2c3553;
+            color: var(--light-text);
+            border-radius: 15px;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .course-card .card-title {
+            color: var(--light-text);
+        }
+
+        .testimonial-card {
+            background-color: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .testimonial-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+        }
+
+        footer {
+            color: var(--light-text);
+        }
+
+        footer a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: var(--accent-lime);
+        }
+
+        .svg-bg-container {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        @media (max-width: 992px) {
+            .hero-section h1 {
+                font-size: 2.5rem;
+            }
+
+            .svg-bg-container {
+                width: 80%;
+                opacity: 0.2;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- SVG Background Definition -->
+    <svg width="0" height="0" style="position:absolute">
+        <defs>
+            <pattern id="dot-grid" width="30" height="30" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.1)"></circle>
+            </pattern>
+            <linearGradient id="lime-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:var(--accent-lime);stop-opacity:1" />
+                <stop offset="100%" style="stop-color:var(--primary-blue);stop-opacity:1" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fs-4" href="index.html">AI Lab</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link active" href="index.html">Головна</a></li>
+                    <li class="nav-item"><a class="nav-link" href="courses.html">Курси</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">Про нас</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Для Батьків</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Контакти</a></li>
+                    <li class="nav-item"><a class="nav-link" href="chat.html">Чат</a></li>
+                </ul>
+                <a href="#" class="btn btn-outline-light d-none d-lg-inline-block">Спробувати безкоштовно</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section bg-dark-blue">
+        <div class="svg-bg-container">
+            <!-- Inline SVG Graphic -->
+            <svg width="100%" height="100%" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+                <rect width="100%" height="100%" fill="url(#dot-grid)" />
+                <g stroke="rgba(0, 191, 255, 0.2)" stroke-width="1">
+                    <line x1="0" y1="100" x2="800" y2="300" />
+                    <line x1="100" y1="0" x2="500" y2="600" />
+                    <line x1="0" y1="500" x2="800" y2="100" />
+                    <line x1="400" y1="0" x2="400" y2="600" />
+                    <line x1="0" y1="300" x2="800" y2="300" />
+                </g>
+                <rect x="550" y="150" width="100" height="100" fill="var(--primary-blue)" fill-opacity="0.5" rx="10" />
+                <rect x="620" y="220" width="150" height="150" fill="var(--accent-lime)" fill-opacity="0.4" rx="10" />
+                <rect x="450" y="350" width="120" height="120" fill="var(--primary-blue)" fill-opacity="0.3" rx="10" />
+            </svg>
+        </div>
+        <div class="container position-relative">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <h1 class="display-3">AI Лаб: Створи своє цифрове майбутнє з AI та кодуванням!</h1>
+                    <p class="lead my-4">Перетворюй шалені ідеї на реальні проєкти. Це не нудні лекції. Це твоя власна
+                        IT-лабораторія.</p>
+                    <a href="courses.html" class="btn btn-lime">Дослідити курси</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why AI Lab Section -->
+    <section class="section-padding bg-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h2 class="display-5 mb-4">Чому обирають AI Лаб?</h2>
+                    <p class="fs-5">Ми не просто вчимо кодувати. Ми запалюємо іскру творчості та вчимо думати як
+                        інноватори.</p>
+                    <p>Наші курси створені практиками з IT-сфери спеціально для підлітків, щоб складні речі стали
+                        простими та захопливими. Ми фокусуємося на проєктному підході, тому кожен студент завершує
+                        навчання з власним портфоліо.</p>
+                </div>
+                <div class="col-lg-6">
+                    <!-- Inline SVG Graphic -->
+                    <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
+                        <g stroke="rgba(0, 191, 255, 0.3)" stroke-width="1.5">
+                            <line x1="10" y1="290" x2="390" y2="10" />
+                            <line x1="10" y1="10" x2="390" y2="290" />
+                        </g>
+                        <rect x="150" y="50" width="80" height="80" fill="var(--primary-blue)" fill-opacity="0.6"
+                            rx="5" />
+                        <rect x="200" y="150" width="120" height="120" fill="var(--accent-lime)" fill-opacity="0.5"
+                            rx="5" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Courses Section -->
+    <section class="section-padding bg-dark-blue">
+        <div class="container">
+            <div class="text-center text-white mb-5">
+                <h2 class="display-5">Наші Курси</h2>
+                <p>Обери свій шлях у світі технологій.</p>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card course-card h-100 p-4">
+                        <i class="bi bi-filetype-py fs-1 text-lime mb-3"></i>
+                        <h3 class="card-title h4">Основи Python</h3>
+                        <p class="card-text">Створи свою першу гру та чат-бота. Вивчи основи однієї з найпопулярніших
+                            мов програмування у світі.</p>
+                        <a href="#" class="btn btn-outline-light mt-auto align-self-start">Дізнатись більше</a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card course-card h-100 p-4">
+                        <i class="bi bi-robot fs-1 text-lime mb-3"></i>
+                        <h3 class="card-title h4">Магія AI</h3>
+                        <p class="card-text">Навчи нейромережу розпізнавати об'єкти, генерувати арти та зрозумій, як
+                            працює штучний інтелект.</p>
+                        <a href="#" class="btn btn-outline-light mt-auto align-self-start">Дізнатись більше</a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card course-card h-100 p-4">
+                        <i class="bi bi-code-slash fs-1 text-lime mb-3"></i>
+                        <h3 class="card-title h4">Web-розробка</h3>
+                        <p class="card-text">Зроби свій перший сайт-портфоліо. Вивчи HTML, CSS та JavaScript – три
+                            стовпи сучасного вебу.</p>
+                        <a href="#" class="btn btn-outline-light mt-auto align-self-start">Дізнатись більше</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="section-padding">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5">Що кажуть наші студенти</h2>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card testimonial-card h-100 p-4 text-center">
+                        <img src="https://placehold.co/100x100/A7FF00/1a2035?text=М" class="rounded-circle mx-auto mb-3"
+                            alt="Фото Максима">
+                        <h4 class="h5">Максим, 15 років</h4>
+                        <p class="fst-italic">“Думав, програмування — це складно. А тут пояснили на прикладі “Зоряних
+                            війн”, і я все зрозумів! Створив свого телеграм-бота.”</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card testimonial-card h-100 p-4 text-center">
+                        <img src="https://placehold.co/100x100/00BFFF/FFFFFF?text=А" class="rounded-circle mx-auto mb-3"
+                            alt="Фото Анни">
+                        <h4 class="h5">Анна, 16 років</h4>
+                        <p class="fst-italic">“Курс з веб-розробки – просто топ! Я зробила сайт для свого хобі, і тепер
+                            друзі просять зробити їм такі самі. Дуже круте відчуття!”</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card testimonial-card h-100 p-4 text-center">
+                        <img src="https://placehold.co/100x100/1a2035/FFFFFF?text=О" class="rounded-circle mx-auto mb-3"
+                            alt="Фото Олега">
+                        <h4 class="h5">Олег, 14 років</h4>
+                        <p class="fst-italic">“Ніколи не думав, що зможу навчати штучний інтелект. Це було неймовірно!
+                            Тепер AI для мене – це не просто магія, а інструмент.”</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark-blue section-padding pb-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5 class="mb-3">AI Lab</h5>
+                    <p class="text-white-50">Освітня платформа, що робить програмування та AI захопливими і зрозумілими
+                        для кожного підлітка.</p>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4"></div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="mb-3">Навігація</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="courses.html">Курси</a></li>
+                        <li><a href="about.html">Про нас</a></li>
+                        <li><a href="#">Для Батьків</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="mb-3">Контакти</h5>
+                    <p class="text-white-50 mb-2">Email: hello@ailab.ua</p>
+                    <div>
+                        <a href="#" class="fs-4 me-2"><i class="bi bi-youtube"></i></a>
+                        <a href="#" class="fs-4 me-2"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="fs-4 me-2"><i class="bi bi-telegram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="text-white-50">
+            <div class="text-center text-white-50 pt-3">
+                <p>&copy; 2025 AI Lab. Всі права захищено.</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <div id="chatbot">
+        <form action="" id="form_chatbox">
+            <div id="answers"></div>
+            <input type="text" name="" id="question" />
+            <input type="button" value="OK" id="ok" />
+        </form>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
