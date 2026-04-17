@@ -104,7 +104,10 @@ async function handleSend() {
             try {
                 const errorData = await response.json();
                 console.error('API Error Response:', errorData);
-                errorDetail = errorData.error || errorData.message || JSON.stringify(errorData);
+                const errorObj = errorData.error || errorData;
+                errorDetail = typeof errorObj === 'object' 
+                    ? (errorObj.message || JSON.stringify(errorObj)) 
+                    : errorObj;
             } catch (e) {
                 const textError = await response.text().catch(() => '');
                 console.error('API Error Text:', textError);
