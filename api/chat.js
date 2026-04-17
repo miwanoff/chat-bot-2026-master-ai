@@ -4,6 +4,10 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
+    if (typeof fetch === 'undefined') {
+        return res.status(500).json({ error: 'fetch is not defined in this environment. Please use Node.js 18 or newer.' });
+    }
+
     const API_KEY = process.env.GEMINI_API_KEY;
 
     if (!API_KEY) {

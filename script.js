@@ -100,9 +100,17 @@ async function handleSend() {
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            console.error('API Error Response:', errorData);
-            throw new Error(errorData.error || 'Помилка сервера');
+            let errorDetail = 'Помилка сервера';
+            try {
+                const errorData = await response.json();
+                console.error('API Error Response:', errorData);
+                errorDetail = errorData.error || errorData.message || JSON.stringify(errorData);
+            } catch (e) {
+                const textError = await response.text().catch(() => '');
+                console.error('API Error Text:', textError);
+                errorDetail = `Статус ${response.status}: ${textError || 'Невідома помилка'}`;
+            }
+            throw new Error(errorDetail);
         }
 
         const data = await response.json();
