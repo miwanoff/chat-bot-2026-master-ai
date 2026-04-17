@@ -1,8 +1,4 @@
-import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-
 // --- КОНФІГУРАЦІЯ ---
-const API_KEY = "AIzaSyDB-Rbw_Hmbk38nrI6ql6ai_1W5KM3Ifmc"; // Вставте свій API-ключ тут пізніше
-
 const businessInfo = `
     Ти – дружній та експертний чат-бот-помічник для стартапу "AI Лаб". Твоя мета – відповідати на запитання користувачів, використовуючи інформацію про компанію та дотримуючись її тону голосу.
 
@@ -23,13 +19,7 @@ const businessInfo = `
     - **Звертання:** Звертайся до користувача на "ти", якщо це підліток, і на "ви", якщо зрозуміло, що це доросла людина (наприклад, батько/мати). Якщо не впевнений, використовуй універсальні форми.
 `;
 
-// --- Ініціалізація моделі ---
-const genAI = new GoogleGenerativeAI(API_KEY);
-const model = genAI.getGenerativeModel({ 
-    model: "gemini-2.5-flash",
-});
-
-let chat;
+let history = [];
 
 // --- UI Logic ---
 document.getElementById("chatbot").addEventListener("click", function () {
@@ -69,22 +59,17 @@ function scrollToBottom() {
 }
 
 // Ініціалізація чату
-async function initializeChat() {
-    chat = model.startChat({
-        history: [
-            {
-                role: "user",
-                parts: [{ text: `Запам'ятай інструкцію: ${businessInfo}\n\nТепер ти готовий відповідати на запитання.` }],
-            },
-            {
-                role: "model",
-                parts: [{ text: "Добре, я готовий. Я – дружній та експертний чат-бот-помічник для стартапу \"AI Лаб\"." }],
-            }
-        ],
-        generationConfig: {
-            maxOutputTokens: 1000,
+function initializeChat() {
+    history = [
+        {
+            role: "user",
+            parts: [{ text: `Запам'ятай інструкцію: ${businessInfo}\n\nТепер ти готовий відповідати на запитання.` }],
         },
-    });
+        {
+            role: "model",
+            parts: [{ text: "Добре, я готовий. Я – дружній та експертний чат-бот-помічник для стартапу \"AI Лаб\"." }],
+        }
+    ];
     
     displayMessage('model', "Привіт! Я помічник AI Лаб. Чим можу допомогти? Запитай мене про наші курси, місію або як почати вчитися кодувати!");
 }
@@ -97,23 +82,40 @@ async function handleSend() {
 
     questionInput.value = "";
     displayMessage('user', q);
-
-    if (!API_KEY) {
-        displayMessage('model', 'Помилка: API-ключ не вказано. Будь ласка, додайте свій ключ у змінну API_KEY у коді.');
-        return;
-    }
-
     showLoading();
 
+    // Додаємо в історію
+    history.push({
+        role: "user",
+        parts: [{ text: q }]
+    });
+
     try {
-        const result = await chat.sendMessage(q);
-        const response = result.response;
-        const text = response.text();
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ contents: history }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Помилка сервера');
+        }
+
+        const data = await response.json();
+        const botText = data.candidates[0].content.parts[0].text;
+
+        // Додаємо відповідь в історію
+        history.push({
+            role: "model",
+            parts: [{ text: botText }]
+        });
 
         hideLoading();
-        displayMessage('model', text);
+        displayMessage('model', botText);
     } catch (error) {
-        console.error("Помилка при запиті до Gemini API:", error);
+        console.error("Помилка при запиті до API:", error);
         hideLoading();
         displayMessage('model', 'Ой, сталася помилка. Спробуйте, будь ласка, ще раз.');
     }
