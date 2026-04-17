@@ -100,7 +100,9 @@ async function handleSend() {
         });
 
         if (!response.ok) {
-            throw new Error('Помилка сервера');
+            const errorData = await response.json().catch(() => ({}));
+            console.error('API Error Response:', errorData);
+            throw new Error(errorData.error || 'Помилка сервера');
         }
 
         const data = await response.json();
