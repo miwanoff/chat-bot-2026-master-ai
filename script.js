@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
 // --- КОНФІГУРАЦІЯ ---
-const API_KEY = ""; // Вставте свій API-ключ тут пізніше
+const API_KEY = "AIzaSyDB-Rbw_Hmbk38nrI6ql6ai_1W5KM3Ifmc"; // Вставте свій API-ключ тут пізніше
 
 const businessInfo = `
     Ти – дружній та експертний чат-бот-помічник для стартапу "AI Лаб". Твоя мета – відповідати на запитання користувачів, використовуючи інформацію про компанію та дотримуючись її тону голосу.
@@ -26,45 +26,46 @@ const businessInfo = `
 // --- Ініціалізація моделі ---
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ 
-    model: "gemini-1.5-flash",
+    model: "gemini-2.5-flash",
 });
 
 let chat;
 
 // --- UI Logic ---
-$("#chatbot").click(function () {
-    $(this).toggleClass("show");
+document.getElementById("chatbot").addEventListener("click", function () {
+    this.classList.toggle("show");
 });
 
 // stopPropagation() equivalent for the message and input area to prevent toggle on interaction
-$("#answers, #question, #ok").click(function (e) {
-    e.stopPropagation();
+["answers", "question", "ok"].forEach(id => {
+    document.getElementById(id).addEventListener("click", function (e) {
+        e.stopPropagation();
+    });
 });
 
 // Додавання повідомлення в чат
 function displayMessage(role, text) {
     const className = role === 'user' ? 'human_answ' : 'bot_answ';
-    $("#answers").append(`<div class="${className}">${text}</div>`);
+    document.getElementById("answers").insertAdjacentHTML('beforeend', `<div class="${className}">${text}</div>`);
     scrollToBottom();
 }
 
 function showLoading() {
-    $("#answers").append(`<div class="bot_answ loading-indicator" id="loading">AI Лаб думає...</div>`);
+    document.getElementById("answers").insertAdjacentHTML('beforeend', `<div class="bot_answ loading-indicator" id="loading">AI Лаб думає...</div>`);
     scrollToBottom();
 }
 
 function hideLoading() {
-    $("#loading").remove();
+    const loading = document.getElementById("loading");
+    if (loading) loading.remove();
 }
 
 function scrollToBottom() {
     const chatBot = document.getElementById("chatbot");
-    $("#chatbot").animate(
-        {
-            scrollTop: chatBot.scrollHeight - chatBot.clientHeight,
-        },
-        100
-    );
+    chatBot.scrollTo({
+        top: chatBot.scrollHeight,
+        behavior: 'smooth'
+    });
 }
 
 // Ініціалізація чату
@@ -90,10 +91,11 @@ async function initializeChat() {
 
 // Обробка відправки
 async function handleSend() {
-    const q = $("#question").val().trim();
+    const questionInput = document.getElementById("question");
+    const q = questionInput.value.trim();
     if (q === "") return;
 
-    $("#question").val("");
+    questionInput.value = "";
     displayMessage('user', q);
 
     if (!API_KEY) {
@@ -117,16 +119,16 @@ async function handleSend() {
     }
 }
 
-$("#ok").click(handleSend);
+document.getElementById("ok").addEventListener("click", handleSend);
 
-$("#question").on("keypress", function (event) {
-    if (event.which === 13) {
+document.getElementById("question").addEventListener("keypress", function (event) {
+    if (event.key === "Enter") {
         handleSend();
-        return false;
+        event.preventDefault();
     }
 });
 
 // Запуск при завантаженні
-$(document).ready(function() {
+document.addEventListener("DOMContentLoaded", function() {
     initializeChat();
 });
