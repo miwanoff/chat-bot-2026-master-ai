@@ -1,10 +1,3 @@
-// --- КОНФІГУРАЦІЯ ---
-
-// ІНФОРМАЦІЯ ПРО ВАШ СТАРТАП ДЛЯ БОТА
-const SYSTEM_PROMPT = import.meta.env?.VITE_SYSTEM_PROMPT || "";
-
-// --- КІНЕЦЬ КОНФІГУРАЦІЇ ---
-
 const chatMessages = document.getElementById('chat-messages');
 const chatForm = document.getElementById('chat-form');
 const chatInput = document.getElementById('chat-input');
