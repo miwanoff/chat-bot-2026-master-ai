@@ -1,6 +1,3 @@
-const chatMessages = document.getElementById('chat-messages');
-const chatForm = document.getElementById('chat-form');
-const chatInput = document.getElementById('chat-input');
 
 let history = [];
 
