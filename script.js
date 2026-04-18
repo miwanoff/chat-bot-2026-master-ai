@@ -1,6 +1,3 @@
-// --- КОНФІГУРАЦІЯ ---
-const SYSTEM_PROMPT = ""; // Береться з .env на сервері
-
 let history = [];
 
 // --- UI Logic ---
