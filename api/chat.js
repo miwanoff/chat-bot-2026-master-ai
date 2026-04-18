@@ -9,6 +9,7 @@ export default async function handler(req, res) {
     }
 
     const API_KEY = process.env.GEMINI_API_KEY?.replace(/['"]/g, '').trim();
+    const SYSTEM_PROMPT = process.env.SYSTEM_PROMPT?.replace(/['"]/g, '').trim();
 
     if (!API_KEY) {
         return res.status(500).json({ error: 'GEMINI_API_KEY is not configured' });
@@ -16,10 +17,28 @@ export default async function handler(req, res) {
 
     try {
         const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-        const { contents } = body || {};
+        let { contents } = body || {};
 
         if (!contents) {
             return res.status(400).json({ error: 'Contents are required' });
+        }
+
+        // Add SYSTEM_PROMPT if it exists and is not already the first message
+        if (SYSTEM_PROMPT && contents.length > 0) {
+            const firstMessageText = contents[0].parts?.[0]?.text || '';
+            if (!firstMessageText.includes(SYSTEM_PROMPT.substring(0, 20))) {
+                contents = [
+                    {
+                        role: "user",
+                        parts: [{ text: `Запам'ятай інструкцію: ${SYSTEM_PROMPT}\n\nТепер ти готовий відповідати на запитання.` }]
+                    },
+                    {
+                        role: "model",
+                        parts: [{ text: "Добре, я готовий. Я – дружній та експертний чат-бот-помічник для стартапу \"AI Лаб\"." }]
+                    },
+                    ...contents
+                ];
+            }
         }
 
         console.log('Sending request to Gemini API...');
